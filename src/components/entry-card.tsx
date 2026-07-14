@@ -45,8 +45,14 @@ export function EntryCard({ entry, animate = false }: EntryCardProps) {
           </div>
         </div>
         <div className="text-right">
-          <p className="font-bold text-xl tabular-nums text-primary">
-            +{formatPoints(Number(entry.total_points))}
+          <p
+            className={cn(
+              'font-bold text-xl tabular-nums',
+              Number(entry.total_points) < 0 ? 'text-destructive' : 'text-primary'
+            )}
+          >
+            {Number(entry.total_points) >= 0 ? '+' : '−'}
+            {formatPoints(Math.abs(Number(entry.total_points)))}
           </p>
           <p className="text-[10px] text-muted-foreground uppercase tracking-wide">pkt</p>
         </div>

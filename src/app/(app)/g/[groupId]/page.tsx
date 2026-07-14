@@ -2,8 +2,9 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { LeaderboardList } from '@/components/leaderboard-list'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
-import { subDays, subMonths, startOfWeek, startOfMonth } from 'date-fns'
-import type { LeaderboardRow } from '@/lib/types'
+import { subDays, startOfWeek, startOfMonth } from 'date-fns'
+import { computeRankMomentum } from '@/lib/stats'
+import type { LeaderboardRow, EntryFeedRow } from '@/lib/types'
 
 interface PageProps {
   params: Promise<{ groupId: string }>
@@ -25,13 +26,21 @@ export default async function LeaderboardPage({ params }: PageProps) {
   }
 
   const now = new Date()
-  const [allTime, thisWeek, thisMonth, last7, last30] = await Promise.all([
+  const [allTime, thisWeek, thisMonth, last7, last30, { data: feedData }] = await Promise.all([
     getLeaderboard(),
     getLeaderboard(startOfWeek(now, { weekStartsOn: 1 })),
     getLeaderboard(startOfMonth(now)),
     getLeaderboard(subDays(now, 7)),
     getLeaderboard(subDays(now, 30)),
+    supabase
+      .from('entry_feed')
+      .select('*')
+      .eq('group_id', groupId)
+      .gte('occurred_at', subDays(now, 14).toISOString()),
   ])
+
+  const recentFeed = (feedData ?? []) as EntryFeedRow[]
+  const momentum = Object.fromEntries(computeRankMomentum(recentFeed))
 
   return (
     <div className="space-y-4">
@@ -52,19 +61,19 @@ export default async function LeaderboardPage({ params }: PageProps) {
           <TabsTrigger value="30d" className="flex-1 text-xs">30 dni</TabsTrigger>
         </TabsList>
         <TabsContent value="alltime">
-          <LeaderboardList rows={allTime} currentUserId={user.id} />
+          <LeaderboardList rows={allTime} currentUserId={user.id} momentum={momentum} />
         </TabsContent>
         <TabsContent value="week">
-          <LeaderboardList rows={thisWeek} currentUserId={user.id} />
+          <LeaderboardList rows={thisWeek} currentUserId={user.id} momentum={momentum} />
         </TabsContent>
         <TabsContent value="month">
-          <LeaderboardList rows={thisMonth} currentUserId={user.id} />
+          <LeaderboardList rows={thisMonth} currentUserId={user.id} momentum={momentum} />
         </TabsContent>
         <TabsContent value="7d">
-          <LeaderboardList rows={last7} currentUserId={user.id} />
+          <LeaderboardList rows={last7} currentUserId={user.id} momentum={momentum} />
         </TabsContent>
         <TabsContent value="30d">
-          <LeaderboardList rows={last30} currentUserId={user.id} />
+          <LeaderboardList rows={last30} currentUserId={user.id} momentum={momentum} />
         </TabsContent>
       </Tabs>
     </div>

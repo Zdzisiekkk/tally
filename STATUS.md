@@ -41,29 +41,25 @@ Deploy: `npx vercel deploy --prod` (po `vercel login` i `vercel link` do projekt
 - Wydajność: auth przez `getSession` (lokalnie) zamiast wielokrotnego `getUser`; skeleton `loading.tsx`; usunięty framer-motion z rankingu/feedu (animacje CSS)
 - Granice błędów: `error.tsx` + `global-error.tsx` (m.in. auto-reload przy deployment skew)
 
-## W TOKU — rozbudowa statystyk i punktacji (punkt 4)
-Funkcje obliczeniowe DODANE w `src/lib/stats.ts`, ale JESZCZE NIE podpięte do UI:
-- `computeCalendar` (heatmapa kalendarzowa)
-- `computeRecords` (rekord wpisu, najlepszy dzień, najlepszy tydzień, najdłuższy streak)
-- `computeForm` (forma — ostatnie N wpisów)
-- `computeRankMomentum` (zmiana pozycji vs poprzedni tydzień → strzałki)
-- `computeMVP` (MVP tygodnia)
-- `computeCategoryBreakdown` (podział punktów wg aktywności)
-- `computeHeadToHead` (pojedynek 1v1)
-- `computeSeasonWinners` (sezony miesięczne + gablota trofeów)
-- `percentile` (percentyl w grupie)
+## Punkt 4 — rozbudowa statystyk i punktacji (ZROBIONE 2026-07-14)
+Funkcje obliczeniowe w `src/lib/stats.ts` są teraz podpięte do UI. Nowe komponenty:
+- `charts/calendar-heatmap.tsx` — heatmapa dni w stylu GitHub (intensywność wg punktów, tooltip)
+- `head-to-head.tsx` — pojedynek 1v1 (2 pickery + porównanie per aktywność, `computeHeadToHead`)
+- `season-trophies.tsx` — gablota trofeów miesięcznych (`computeSeasonWinners`)
+- `stat-highlights.tsx` — rekordy + forma (sparkline) + MVP + percentyl
+- `charts/category-breakdown.tsx` — podział punktów wg aktywności (stacked bar CSS)
 
-### Następne kroki (dokończyć punkt 4)
-1. Komponenty klienckie:
-   - `calendar-heatmap.tsx` (siatka dni jak GitHub, intensywność wg punktów)
-   - `head-to-head.tsx` (picker 2 osób + porównanie per aktywność)
-   - `season-trophies.tsx` (lista zwycięzców miesięcy)
-   - `stat-highlights.tsx` (rekordy + forma + MVP + percentyl)
-   - `category-breakdown.tsx` (wykres kołowy/paskowy)
-2. Przebudować `src/app/(app)/g/[groupId]/stats/page.tsx`: pobrać raz `entry_feed` grupy (limit ~1000) + `leaderboard`, przekazać do powyższych komponentów.
-3. Ranking: policzyć `computeRankMomentum` z feedu i przekazać mapę do `LeaderboardList` → strzałki góra/dół przy pozycjach.
-4. Profil gracza: dodać heatmapę + formę + rekordy (reużyć komponenty).
-5. Punkty ujemne / kary: dopuścić ujemną wartość w edytorze aktywności (`activities-client.tsx`) + kategoria "Kary".
+Wpięcia:
+- `stats/page.tsx` — pobiera raz `entry_feed` (limit 1000) + `leaderboard`, liczy statystyki serwerowo i renderuje: rekordy grupy + MVP, heatmapę, timeline, podział punktów, top aktywności, pojedynek 1v1, sezony.
+- Ranking (`g/[groupId]/page.tsx` + `leaderboard-list.tsx`) — `computeRankMomentum` z feedu (14 dni) → strzałki awans/spadek przy pozycjach (prop `momentum`).
+- Profil gracza (`p/[userId]/page.tsx`) — dodano heatmapę + rekordy/forma/percentyl (`StatHighlights`).
+- Punkty ujemne / kary — edytor aktywności dopuszcza ujemną wartość (hint + badge "Kara"); `entry-card` i podgląd w `entry-composer` poprawnie pokazują znak +/− i kolor (czerwony dla ujemnych). DB liczy ujemne bez zmian (brak CHECK na `activities.value`).
+
+Weryfikacja: `npm run build` (0 błędów, TS OK), `eslint` czysty, dev server bootuje.
+
+### Backlog dot. statystyk (opcjonalne dopieszczenia)
+- Kategoria-kontener "Kary" w seedzie grupy (obecnie kara = pojedyncza aktywność z ujemną wartością).
+- `activity-bar-chart` / `timeline-chart` używają zahardkodowanych kolorów `#0A84FF` itp. zamiast tokenów `--chart-*` — do ujednolicenia z motywem.
 
 ## Pozostałe kroki manualne (dashboard — NIE w kodzie)
 - Supabase → Auth → URL Configuration: Site URL = https://punktacja.vercel.app; Redirect URLs += `https://punktacja.vercel.app/**` oraz `http://localhost:3000/**`

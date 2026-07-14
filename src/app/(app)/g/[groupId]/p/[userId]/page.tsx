@@ -5,7 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { EntryCard } from '@/components/entry-card'
 import { BadgeGrid } from '@/components/badge-grid'
 import { ActivityBarChart } from '@/components/charts/activity-bar-chart'
-import { computeBadges, computeStreak } from '@/lib/stats'
+import { CalendarHeatmap } from '@/components/charts/calendar-heatmap'
+import { StatHighlights } from '@/components/stat-highlights'
+import {
+  computeBadges,
+  computeStreak,
+  computeCalendar,
+  computeRecords,
+  computeForm,
+  percentile,
+} from '@/lib/stats'
 import { formatPoints } from '@/lib/points'
 import { subDays } from 'date-fns'
 import type { EntryFeedRow, LeaderboardRow, StatsActivityRow, Profile } from '@/lib/types'
@@ -76,6 +85,10 @@ export default async function PlayerProfilePage({ params }: PageProps) {
   const biggestEntry = feed.reduce((max, e) => Math.max(max, Number(e.total_points)), 0)
   const streak = computeStreak(feed, userId)
   const badges = computeBadges(allTimeTotal, feed, userId)
+  const calendar = computeCalendar(feed, { userId })
+  const records = computeRecords(feed, userId)
+  const form = computeForm(feed, userId)
+  const pct = percentile(allTimeLb, userId)
 
   return (
     <div className="space-y-4">
@@ -113,6 +126,22 @@ export default async function PlayerProfilePage({ params }: PageProps) {
           </Card>
         ))}
       </div>
+
+      {/* Records & form */}
+      <Card>
+        <CardHeader><CardTitle className="text-base">Rekordy i forma</CardTitle></CardHeader>
+        <CardContent>
+          <StatHighlights records={records} form={form} percentileValue={pct} />
+        </CardContent>
+      </Card>
+
+      {/* Activity heatmap */}
+      <Card>
+        <CardHeader><CardTitle className="text-base">Aktywność w czasie</CardTitle></CardHeader>
+        <CardContent>
+          <CalendarHeatmap cells={calendar} />
+        </CardContent>
+      </Card>
 
       {/* Badges */}
       <Card>

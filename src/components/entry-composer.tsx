@@ -111,7 +111,8 @@ export function EntryComposer({ groupId, activities, members }: EntryComposerPro
     if (error) {
       toast.error(error.message === 'NOT_ADMIN' ? 'Tylko admin może dodawać wpisy' : error.message)
     } else {
-      toast.success(`Dodano +${formatPoints(previewTotal)} pkt!`)
+      const sign = previewTotal >= 0 ? '+' : '−'
+      toast.success(`Dodano ${sign}${formatPoints(Math.abs(previewTotal))} pkt!`)
       setItems([])
       setNote('')
       router.push(`/g/${groupId}/feed`)
@@ -226,11 +227,21 @@ export function EntryComposer({ groupId, activities, members }: EntryComposerPro
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-primary/10 border border-primary/20 rounded-xl p-4 text-center"
+            className={
+              previewTotal < 0
+                ? 'bg-destructive/10 border border-destructive/20 rounded-xl p-4 text-center'
+                : 'bg-primary/10 border border-primary/20 rounded-xl p-4 text-center'
+            }
           >
             <p className="text-xs text-muted-foreground mb-1">Podgląd sumy</p>
-            <p className="text-4xl font-bold tabular-nums text-primary">
-              +{formatPoints(previewTotal)}
+            <p
+              className={
+                previewTotal < 0
+                  ? 'text-4xl font-bold tabular-nums text-destructive'
+                  : 'text-4xl font-bold tabular-nums text-primary'
+              }
+            >
+              {previewTotal >= 0 ? '+' : '−'}{formatPoints(Math.abs(previewTotal))}
             </p>
             <p className="text-xs text-muted-foreground mt-1">pkt</p>
           </motion.div>

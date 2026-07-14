@@ -1,4 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ChevronUp, ChevronDown, Minus } from 'lucide-react'
 import { formatPoints } from '@/lib/points'
 import type { LeaderboardRow } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -6,10 +7,33 @@ import { cn } from '@/lib/utils'
 interface LeaderboardListProps {
   rows: LeaderboardRow[]
   currentUserId?: string
+  /** user_id → rank change vs last week (positive = moved up). */
+  momentum?: Record<string, number>
 }
 
 function initials(name: string) {
   return name.slice(0, 2).toUpperCase()
+}
+
+/** Small up/down/steady indicator for weekly rank movement. */
+function Momentum({ delta }: { delta: number | undefined }) {
+  if (delta == null) return null
+  if (delta === 0) {
+    return <Minus className="h-3 w-3 text-muted-foreground/60 shrink-0" aria-label="bez zmian" />
+  }
+  const up = delta > 0
+  return (
+    <span
+      className={cn(
+        'flex items-center text-[10px] font-bold tabular-nums shrink-0',
+        up ? 'text-success' : 'text-destructive'
+      )}
+      aria-label={up ? `awans o ${delta}` : `spadek o ${-delta}`}
+    >
+      {up ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+      {Math.abs(delta)}
+    </span>
+  )
 }
 
 /* Podium seat for a single top-3 player */
@@ -61,7 +85,7 @@ function PodiumSeat({
   )
 }
 
-export function LeaderboardList({ rows, currentUserId }: LeaderboardListProps) {
+export function LeaderboardList({ rows, currentUserId, momentum }: LeaderboardListProps) {
   if (rows.length === 0) {
     return (
       <div className="text-center py-16 text-muted-foreground text-sm">
@@ -108,6 +132,7 @@ export function LeaderboardList({ rows, currentUserId }: LeaderboardListProps) {
                 <span className="w-6 text-center text-sm font-bold tabular-nums text-muted-foreground shrink-0">
                   {rank}
                 </span>
+                {momentum && <Momentum delta={momentum[row.user_id]} />}
                 <Avatar className="h-9 w-9 shrink-0">
                   <AvatarImage src={row.avatar_url ?? undefined} />
                   <AvatarFallback className="text-xs font-bold">{initials(row.display_name)}</AvatarFallback>

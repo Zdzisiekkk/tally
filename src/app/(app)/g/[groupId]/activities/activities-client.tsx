@@ -150,7 +150,17 @@ export function ActivitiesClient({ groupId, initialActivities, categories, isAdm
                       )}
                     </div>
                     <p className="text-xs text-muted-foreground mt-0.5">
-                      Wartość: <span className="tabular-nums font-semibold">{act.value}</span>
+                      Wartość:{' '}
+                      <span
+                        className={`tabular-nums font-semibold ${act.value < 0 ? 'text-destructive' : ''}`}
+                      >
+                        {act.value}
+                      </span>
+                      {act.value < 0 && (
+                        <span className="ml-1.5 text-[10px] px-1.5 py-0.5 rounded font-medium bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300">
+                          Kara
+                        </span>
+                      )}
                     </p>
                   </div>
                   {isAdmin && (
@@ -206,6 +216,9 @@ export function ActivitiesClient({ groupId, initialActivities, categories, isAdm
                 value={form.value}
                 onChange={(e) => setForm((f) => ({ ...f, value: e.target.value }))}
               />
+              <p className="text-[11px] text-muted-foreground">
+                Ujemna wartość = kara (odejmuje punkty).
+              </p>
             </div>
             {categories.length > 0 && (
               <div className="space-y-1">
