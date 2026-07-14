@@ -34,7 +34,14 @@ export async function proxy(request: NextRequest) {
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone()
+    const dest = pathname + request.nextUrl.search
     url.pathname = '/login'
+    url.search = ''
+    // Preserve the intended destination (e.g. an invite link) so the user
+    // returns there after logging in. Skip the root to avoid a noop param.
+    if (pathname !== '/') {
+      url.searchParams.set('next', dest)
+    }
     return NextResponse.redirect(url)
   }
 
