@@ -12,10 +12,20 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Deployment skew / stale chunk — force a hard reload once
-    if (/ChunkLoadError|Loading chunk|Failed to fetch dynamically imported module/i.test(error.message)) {
+    // Deployment-skew self-heal. In production the real error message is masked
+    // (only a digest reaches the client), so matching on the message misses most
+    // stale-chunk errors after a new deploy. Force a single hard reload — guarded
+    // by sessionStorage so a genuinely broken page can't loop — to pull the fresh
+    // chunks. If the error persists past the reload, the UI below is shown.
+    const KEY = 'tally-error-reloaded'
+    if (sessionStorage.getItem(KEY) !== '1') {
+      sessionStorage.setItem(KEY, '1')
       window.location.reload()
+      return
     }
+    // Clear the guard after a clean render so future skews can self-heal too.
+    const t = setTimeout(() => sessionStorage.removeItem(KEY), 5000)
+    return () => clearTimeout(t)
   }, [error])
 
   return (
