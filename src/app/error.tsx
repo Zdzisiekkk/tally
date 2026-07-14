@@ -12,20 +12,10 @@ export default function Error({
   reset: () => void
 }) {
   useEffect(() => {
-    // Deployment-skew self-heal. In production the real error message is masked
-    // (only a digest reaches the client), so matching on the message misses most
-    // stale-chunk errors after a new deploy. Force a single hard reload — guarded
-    // by sessionStorage so a genuinely broken page can't loop — to pull the fresh
-    // chunks. If the error persists past the reload, the UI below is shown.
-    const KEY = 'tally-error-reloaded'
-    if (sessionStorage.getItem(KEY) !== '1') {
-      sessionStorage.setItem(KEY, '1')
+    // Deployment skew / stale chunk — force a hard reload once
+    if (/ChunkLoadError|Loading chunk|Failed to fetch dynamically imported module/i.test(error.message)) {
       window.location.reload()
-      return
     }
-    // Clear the guard after a clean render so future skews can self-heal too.
-    const t = setTimeout(() => sessionStorage.removeItem(KEY), 5000)
-    return () => clearTimeout(t)
   }, [error])
 
   return (
@@ -39,6 +29,11 @@ export default function Error({
           Odśwież stronę lub spróbuj ponownie. Jeśli problem wraca, daj znać.
         </p>
       </div>
+      {/* TEMP diagnostic — remove after debugging */}
+      <pre className="max-w-md overflow-auto whitespace-pre-wrap rounded-lg bg-card p-3 text-left text-[11px] text-destructive ring-1 ring-border">
+        {error?.message || '(brak message)'}
+        {error?.digest ? `\ndigest: ${error.digest}` : ''}
+      </pre>
       <div className="flex gap-2">
         <Button onClick={reset}>Spróbuj ponownie</Button>
         <Button variant="outline" onClick={() => window.location.assign('/')}>

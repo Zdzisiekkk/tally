@@ -1,25 +1,11 @@
 'use client'
 
-import { useEffect } from 'react'
-
 export default function GlobalError({
   reset,
 }: {
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    // Deployment-skew self-heal (see error.tsx for rationale).
-    const KEY = 'tally-global-error-reloaded'
-    if (sessionStorage.getItem(KEY) !== '1') {
-      sessionStorage.setItem(KEY, '1')
-      window.location.reload()
-      return
-    }
-    const t = setTimeout(() => sessionStorage.removeItem(KEY), 5000)
-    return () => clearTimeout(t)
-  }, [])
-
   return (
     <html lang="pl">
       <body style={{ background: '#0A0A0A', color: '#F3F1EC', fontFamily: 'monospace' }}>

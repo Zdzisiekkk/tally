@@ -24,6 +24,7 @@ interface PageProps {
 }
 
 export default async function PlayerProfilePage({ params }: PageProps) {
+ try {
   const { groupId, userId } = await params
   const supabase = await createClient()
 
@@ -176,4 +177,17 @@ export default async function PlayerProfilePage({ params }: PageProps) {
       </div>
     </div>
   )
+ } catch (err) {
+   // Re-throw Next.js control-flow signals (redirect / notFound)
+   const digest = (err as { digest?: string })?.digest
+   if (typeof digest === 'string' && digest.startsWith('NEXT_')) throw err
+   const e = err as Error
+   return (
+     <pre className="max-w-full overflow-auto whitespace-pre-wrap rounded-lg bg-card p-4 text-left text-[11px] text-destructive ring-1 ring-border">
+       PROFILE ERROR: {e?.message || String(err)}
+       {'\n\n'}
+       {e?.stack || ''}
+     </pre>
+   )
+ }
 }
