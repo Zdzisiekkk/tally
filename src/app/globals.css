@@ -1,0 +1,191 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-mono-display);
+  --font-mono: var(--font-mono-display);
+  --font-heading: var(--font-mono-display);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* ── Upwise-inspired design tokens ──
+   Dark-first, monospace, warm red-orange accent */
+:root {
+  /* warm cream light theme */
+  --background: #FBF6F0;
+  --foreground: #17140F;
+  --card: #FFFFFF;
+  --card-foreground: #17140F;
+  --popover: #FFFFFF;
+  --popover-foreground: #17140F;
+  --primary: #FF3B23;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F0E9E0;
+  --secondary-foreground: #17140F;
+  --muted: #F3ECE3;
+  --muted-foreground: #7A736A;
+  --accent: #F0E9E0;
+  --accent-foreground: #17140F;
+  --destructive: #FF3B30;
+  --border: #E7DED2;
+  --input: #E7DED2;
+  --ring: #FF3B23;
+  --radius: 1.1rem;
+  --success: #2FB86B;
+  --warning: #FF9500;
+  --chart-1: #FF3B23;
+  --chart-2: #FF7A2E;
+  --chart-3: #FFB020;
+  --chart-4: #2FB86B;
+  --chart-5: #7A736A;
+  --sidebar: #F3ECE3;
+  --sidebar-foreground: #17140F;
+  --sidebar-primary: #FF3B23;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F0E9E0;
+  --sidebar-accent-foreground: #17140F;
+  --sidebar-border: #E7DED2;
+  --sidebar-ring: #FF3B23;
+}
+
+.dark {
+  /* near-black terminal theme */
+  --background: #0A0A0A;
+  --foreground: #F3F1EC;
+  --card: #151515;
+  --card-foreground: #F3F1EC;
+  --popover: #171717;
+  --popover-foreground: #F3F1EC;
+  --primary: #FF3B23;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E1E1E;
+  --secondary-foreground: #F3F1EC;
+  --muted: #1C1C1C;
+  --muted-foreground: #8C877E;
+  --accent: #1E1E1E;
+  --accent-foreground: #F3F1EC;
+  --destructive: #FF453A;
+  --border: #262626;
+  --input: #2A2A2A;
+  --ring: #FF3B23;
+  --success: #34D07E;
+  --warning: #FF9F0A;
+  --chart-1: #FF3B23;
+  --chart-2: #FF7A2E;
+  --chart-3: #FFB020;
+  --chart-4: #34D07E;
+  --chart-5: #8C877E;
+  --sidebar: #121212;
+  --sidebar-foreground: #F3F1EC;
+  --sidebar-primary: #FF3B23;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1E1E1E;
+  --sidebar-accent-foreground: #F3F1EC;
+  --sidebar-border: #262626;
+  --sidebar-ring: #FF3B23;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "tnum";
+    letter-spacing: -0.01em;
+  }
+  html {
+    @apply font-mono;
+  }
+  h1, h2, h3, h4, .font-heading {
+    letter-spacing: -0.03em;
+    font-weight: 700;
+  }
+}
+
+/* Tabular nums for score display */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Safe area bottom for mobile tab bar */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ── Upwise decorative utilities ── */
+
+/* warm sunset gradient (hero backgrounds) */
+.bg-sunset {
+  background:
+    radial-gradient(120% 120% at 50% -10%, #FF7A2E 0%, #FF3B23 34%, transparent 70%);
+}
+.bg-sunset-soft {
+  background:
+    radial-gradient(140% 100% at 80% -20%, rgba(255,122,46,0.45) 0%, transparent 55%),
+    radial-gradient(120% 90% at 0% 120%, rgba(255,59,35,0.30) 0%, transparent 55%);
+}
+
+/* podium spotlight behind top-3 */
+.bg-podium {
+  background:
+    radial-gradient(80% 90% at 50% 0%, rgba(255,59,35,0.55) 0%, rgba(255,59,35,0.12) 45%, transparent 72%);
+}
+
+/* accent gradient for pills / progress */
+.grad-accent {
+  background: linear-gradient(135deg, #FF7A2E 0%, #FF3B23 60%, #E5321C 100%);
+}
+
+/* editorial mono index like "(05)" */
+.mono-index {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.05em;
+}
+
+/* subtle top glow used on dark cards */
+.card-glow {
+  box-shadow: 0 1px 0 0 rgba(255,255,255,0.04) inset, 0 12px 40px -24px rgba(0,0,0,0.9);
+}
