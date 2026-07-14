@@ -29,11 +29,6 @@ export default function Error({
           Odśwież stronę lub spróbuj ponownie. Jeśli problem wraca, daj znać.
         </p>
       </div>
-      {/* TEMP diagnostic — remove after debugging */}
-      <pre className="max-w-md overflow-auto whitespace-pre-wrap rounded-lg bg-card p-3 text-left text-[11px] text-destructive ring-1 ring-border">
-        {error?.message || '(brak message)'}
-        {error?.digest ? `\ndigest: ${error.digest}` : ''}
-      </pre>
       <div className="flex gap-2">
         <Button onClick={reset}>Spróbuj ponownie</Button>
         <Button variant="outline" onClick={() => window.location.assign('/')}>
